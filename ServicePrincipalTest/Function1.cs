@@ -31,11 +31,25 @@ namespace ServicePrincipalTest
             string subscriptionId = req.Query["subscriptionId"];
             string resourceGroupName = req.Query["resourceGroupName"];
             string tagsToCheck = req.Query["tagsToCheck"];
+            string mode = req.Query["mode"];
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(requestBody);
-            subscriptionId = data["subscriptionId"];
-            resourceGroupName = data["resourceGroupName"];
-            tagsToCheck = data["tags"];
+            if (data.ContainsKey("mode"))
+            {
+                mode = data["mode"];
+            }
+            if (data.ContainsKey("subscriptionId"))
+            {
+                subscriptionId = data["subscriptionId"];
+            }
+            if (data.ContainsKey("resourceGroupName"))
+            {
+                resourceGroupName = data["resourceGroupName"];
+            }
+            if (data.ContainsKey("tagsToCheck"))
+            {
+                tagsToCheck = data["tagsToCheck"];
+            }
 
             string resultstring = requestBody.ToString();
             string token = Authenticate().Result;
@@ -43,28 +57,47 @@ namespace ServicePrincipalTest
             //subscriptionId: 4dda6ad2-730a-4053-88d1-0fa7ff209aea
             //resourceGroupName: 
             var azure = Azure.Configure().WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic).Authenticate(credentials).WithSubscription(subscriptionId);
-
+            
             var vmList = !string.IsNullOrEmpty(resourceGroupName)
                 ? azure.VirtualMachines.ListByResourceGroup(resourceGroupName)
                 : azure.VirtualMachines.List();
 
+           
             if (!string.IsNullOrEmpty(tagsToCheck))
             {               
                 foreach (var vm in vmList)
                 {
-                    if (vm.Tags.ContainsKey(tagsToCheck) && vm.Tags[tagsToCheck].ToLower() == "true")
+                    if (vm.Tags.ContainsKey(tagsToCheck))
                     {
-                        
+                        resultstring += vm.Name;
+                        if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated))
+                        {
+                            vm.Start();
+                        }
+                        else if (mode == "stop")
+                        {
+                            vm.PowerOff();
+                        }
+                    }
+                }                
+            }
+            else
+            {
+                foreach(var vm in vmList)
+                {
+                    resultstring += vm.Name;
+                    if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated))
+                    {
+                        vm.Start();
+                    }
+                    else if (mode == "stop")
+                    {
+                        vm.PowerOff();
                     }
                 }
-                finalResultVms.IntersectWith(vmsWithTags);
-            }          
-
-            foreach(var vm in finalResultVms)
-            {
-                resultstring += vm.Name;
-                resultstring += ",";
             }
+
+        
             return subscriptionId != null
                 ? (ActionResult)new OkObjectResult($"Try, {resultstring}")
                 : new BadRequestObjectResult("Please pass a name on the query string or in the request body");

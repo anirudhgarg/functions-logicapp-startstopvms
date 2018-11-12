@@ -261,3 +261,5 @@ __pycache__/
 *.pyc
 /ServicePrincipalTest/Properties/PublishProfiles/anirudhgServicePrincipalTest - Zip Deploy.pubxml
 /ServicePrincipalTest/Properties/PublishProfiles/anirudhgevent - Zip Deploy.pubxml
+/ServicePrincipalTest/Properties/PublishProfiles/anirudhgevent - Web Deploy.pubxml
+/ServicePrincipalTest/Properties/PublishProfiles/anirudhgSPtest1 - Web Deploy.pubxml

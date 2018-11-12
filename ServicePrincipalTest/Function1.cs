@@ -62,45 +62,61 @@ namespace ServicePrincipalTest
                 ? azure.VirtualMachines.ListByResourceGroup(resourceGroupName)
                 : azure.VirtualMachines.List();
 
-           
+            List<Task> tasks = new List<Task>();
             if (!string.IsNullOrEmpty(tagsToCheck))
             {               
                 foreach (var vm in vmList)
-                {
+                {                   
                     if (vm.Tags.ContainsKey(tagsToCheck))
                     {
-                        resultstring += vm.Name;
-                        if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated))
+                        Task task = null;
+                        if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated || vm.PowerState == PowerState.Deallocating || vm.PowerState == PowerState.Stopping))
                         {
-                            vm.Start();
+                            task = StartVM(vm);
                         }
                         else if (mode == "stop")
                         {
-                            vm.PowerOff();
+                            task = DeallocateVM(vm);
                         }
+                        if(task != null) tasks.Add(task);
                     }
-                }                
+                }        
             }
             else
             {
                 foreach(var vm in vmList)
                 {
-                    resultstring += vm.Name;
-                    if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated))
+                    Task task = null;
+                    if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated || vm.PowerState == PowerState.Deallocating || vm.PowerState == PowerState.Stopping))
                     {
-                        vm.Start();
+                        task = StartVM(vm);
                     }
                     else if (mode == "stop")
                     {
-                        vm.PowerOff();
+                        task = DeallocateVM(vm);
                     }
+                    if (task != null) tasks.Add(task);
                 }
+              
+            }
+            foreach (Task task in tasks)
+            {
+                await task;
             }
 
-        
             return subscriptionId != null
                 ? (ActionResult)new OkObjectResult($"Try, {resultstring}")
                 : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+        }
+
+        public static async Task StartVM(IVirtualMachine virtualMachine)
+        {
+            await virtualMachine.StartAsync();
+        }
+
+        public static async Task DeallocateVM(IVirtualMachine virtualMachine)
+        {
+            await virtualMachine.DeallocateAsync();
         }
 
         public static async Task<string> Authenticate()

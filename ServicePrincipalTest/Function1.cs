@@ -1,5 +1,4 @@
 using System.IO;
-using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -72,10 +71,12 @@ namespace ServicePrincipalTest
                         Task task = null;
                         if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated || vm.PowerState == PowerState.Deallocating || vm.PowerState == PowerState.Stopping))
                         {
+                            log.LogInformation("Starting vm {0}", vm.Name);
                             task = StartVM(vm);
                         }
                         else if (mode == "stop")
                         {
+                            log.LogInformation("Stopping vm {0}", vm.Name);
                             task = DeallocateVM(vm);
                         }
                         if(task != null) tasks.Add(task);
@@ -89,10 +90,12 @@ namespace ServicePrincipalTest
                     Task task = null;
                     if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated || vm.PowerState == PowerState.Deallocating || vm.PowerState == PowerState.Stopping))
                     {
+                        log.LogInformation("Starting vm {0}", vm.Name);
                         task = StartVM(vm);
                     }
                     else if (mode == "stop")
                     {
+                        log.LogInformation("Stopping vm {0}", vm.Name);
                         task = DeallocateVM(vm);
                     }
                     if (task != null) tasks.Add(task);

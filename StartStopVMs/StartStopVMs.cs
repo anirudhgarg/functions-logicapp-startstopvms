@@ -17,9 +17,7 @@ using Microsoft.Azure.Management.Compute.Fluent;
 using System.Text;
 
 namespace StartStopVMs
-{
-    /*
-     */
+{    
     public static class StartStopVMs
     {
         [FunctionName("StartStopVMs")]

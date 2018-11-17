@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2048
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServicePrincipalTest", "ServicePrincipalTest\ServicePrincipalTest.csproj", "{D7B5A5DE-EB0D-45A3-8F77-4D29DE69500B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StartStopVMsProject", "StartStopVMs\StartStopVMsProject.csproj", "{D7B5A5DE-EB0D-45A3-8F77-4D29DE69500B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

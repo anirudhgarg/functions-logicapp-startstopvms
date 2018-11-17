@@ -14,14 +14,15 @@ using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using Microsoft.Azure.Services.AppAuthentication;
 using System.Collections.Generic;
 using Microsoft.Azure.Management.Compute.Fluent;
+using System.Text;
 
-namespace ServicePrincipalTest
+namespace StartStopVMs
 {
     /*
      */
-    public static class StartStopVM
+    public static class StartStopVMs
     {
-        [FunctionName("ServicePrincipalTest")]
+        [FunctionName("StartStopVMs")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req, ILogger log)
         {
@@ -31,6 +32,8 @@ namespace ServicePrincipalTest
             string resourceGroupName = req.Query["resourceGroupName"];
             string tagsToCheck = req.Query["tagsToCheck"];
             string mode = req.Query["mode"];
+            StringBuilder resultText = new StringBuilder();
+           
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(requestBody);
             if (data.ContainsKey("mode"))
@@ -48,6 +51,11 @@ namespace ServicePrincipalTest
             if (data.ContainsKey("tagsToCheck"))
             {
                 tagsToCheck = data["tagsToCheck"];
+            }           
+
+            if(string.IsNullOrEmpty(subscriptionId) || string.IsNullOrEmpty(mode))
+            {
+                return new BadRequestObjectResult("Please make sure subscriptionId and mode are part of the post json body");
             }
 
             string resultstring = requestBody.ToString();
@@ -62,66 +70,40 @@ namespace ServicePrincipalTest
                 : azure.VirtualMachines.List();
 
             List<Task> tasks = new List<Task>();
-            if (!string.IsNullOrEmpty(tagsToCheck))
-            {               
-                foreach (var vm in vmList)
-                {                   
-                    if (vm.Tags.ContainsKey(tagsToCheck))
-                    {
-                        Task task = null;
-                        if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated || vm.PowerState == PowerState.Deallocating || vm.PowerState == PowerState.Stopping))
-                        {
-                            log.LogInformation("Starting vm {0}", vm.Name);
-                            task = StartVM(vm);
-                        }
-                        else if (mode == "stop")
-                        {
-                            log.LogInformation("Stopping vm {0}", vm.Name);
-                            task = DeallocateVM(vm);
-                        }
-                        if(task != null) tasks.Add(task);
-                    }
-                }        
-            }
-            else
-            {
-                foreach(var vm in vmList)
+            int numberOfVmsAffected = 0;
+            foreach (var vm in vmList)
+            {                   
+                if ( (!string.IsNullOrEmpty(tagsToCheck) && vm.Tags.ContainsKey(tagsToCheck)) || string.IsNullOrEmpty(tagsToCheck) )
                 {
                     Task task = null;
                     if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated || vm.PowerState == PowerState.Deallocating || vm.PowerState == PowerState.Stopping))
                     {
                         log.LogInformation("Starting vm {0}", vm.Name);
-                        task = StartVM(vm);
+                        resultText.AppendLine(string.Format("Started vm {0}", vm.Name));
+                        numberOfVmsAffected++;
+                        task =  vm.StartAsync();
                     }
                     else if (mode == "stop")
                     {
                         log.LogInformation("Stopping vm {0}", vm.Name);
-                        task = DeallocateVM(vm);
+                        resultText.AppendLine(string.Format("Stopped vm {0}", vm.Name));
+                        numberOfVmsAffected++;
+                        task =  vm.DeallocateAsync();
                     }
-                    if (task != null) tasks.Add(task);
+                    if(task != null) tasks.Add(task);
                 }
-              
-            }
+            }                    
+           
             foreach (Task task in tasks)
             {
                 await task;
             }
 
-            return subscriptionId != null
-                ? (ActionResult)new OkObjectResult($"Try, {resultstring}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
-        }
+            resultText.Insert(0, string.Format("Numbers of VM's affected {0}{1}", numberOfVmsAffected, System.Environment.NewLine));
 
-        public static async Task StartVM(IVirtualMachine virtualMachine)
-        {
-            await virtualMachine.StartAsync();
+            return new OkObjectResult($"{resultText.ToString()}");                
         }
-
-        public static async Task DeallocateVM(IVirtualMachine virtualMachine)
-        {
-            await virtualMachine.DeallocateAsync();
-        }
-
+      
         public static async Task<string> Authenticate()
         {
             var azureServiceTokenProvider = new AzureServiceTokenProvider();

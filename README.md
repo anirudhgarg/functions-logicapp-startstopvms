@@ -7,7 +7,6 @@
 <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png"/>
 </a>
 
-This template deploys an **AKS cluster**.
 
 See https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough for a walkthrough.
 

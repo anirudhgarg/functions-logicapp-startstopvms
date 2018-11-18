@@ -70,23 +70,7 @@
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~1"
-                        },
-                        {
-                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                            "value": "6.5.0"
-                        },
-                        {
-                            "name": "ImageResize-Width",
-                            "value": 100
-                        },
-                        {
-                            "name": "ImageResize-Height",
-                            "value": 100
-                        },
-                        {
-                            "name":"ImageRepository",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                            "value": "~2"
                         }
                     ]
                 }

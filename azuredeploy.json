@@ -13,7 +13,7 @@
     "variables": {
         "functionAppName": "[parameters('appName')]",
         "hostingPlanName": "[concat(parameters('appName'), '-plan')]",
-        "repoURL": "https://github.com/anirudhgarg/functions-logicapp-startstopvms/tree/master/StartStopVMs/bin/Release/netcoreapp2.1",
+        "repoURL": "https://github.com/AzureBytes/functionshttpecho.git",
         "branch": "master",
         "storageAccountName": "[concat('storage', uniquestring(resourceGroup().id))]",
         "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"

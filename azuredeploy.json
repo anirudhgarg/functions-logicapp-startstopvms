@@ -44,6 +44,9 @@
             "type": "Microsoft.Web/sites",
             "name": "[variables('functionAppName')]",
             "location": "[resourceGroup().location]",
+            "identity": {
+                 "type": "SystemAssigned"
+            },
             "kind": "functionapp",
             "properties": {
                 "name": "[variables('functionAppName')]",

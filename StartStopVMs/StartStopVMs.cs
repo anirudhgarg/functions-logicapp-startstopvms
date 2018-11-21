@@ -24,8 +24,6 @@ namespace StartStopVMs
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req, ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
-
             string subscriptionId = req.Query["subscriptionId"];
             string resourceGroupName = req.Query["resourceGroupName"];
             string tagsToCheck = req.Query["tagsToCheck"];

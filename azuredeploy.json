@@ -16,7 +16,9 @@
     "repoURL": "https://github.com/anirudhgarg/functions-logicapps-startstopvms-bytes.git",
     "branch": "master",
     "storageAccountName": "[concat('storage', uniquestring(resourceGroup().id))]",
-    "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+    "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+    "startVMslogicAppName": "[concat(parameters('appName'), '-StartVMs')]",
+    "stopVMslogicAppName": "[concat(parameters('appName'), '-StopVMs')]"
   },
   "resources": [
     {
@@ -99,9 +101,9 @@
       ]
     },
     {
-      "comments": "",
+      "comments": "Logic App for Start Vm's",
       "type": "Microsoft.Logic/workflows",
-      "name": "[parameters('appName')]",
+      "name": "[variables('startVMslogicAppName')]",
       "apiVersion": "2017-07-01",
       "location": "[resourceGroup().location]",
       "tags": {},
@@ -243,6 +245,179 @@
                     "name": "Function Body",
                     "type": "String",
                     "value": "{\"mode\":\"start\", \"subscriptionId\":\"@{variables('Subscription Id')}\"}"
+                  }
+                ]
+              }
+            },
+            "StartStopVMs": {
+              "runAfter": {
+                "Condition_2": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Function",
+              "inputs": {
+                "body": "@variables('Function Body')",
+                "function": {
+                  "id": "[resourceId('Microsoft.Web/sites/functions', variables('functionAppName'),variables('functionName'))]"
+                },
+                "method": "POST"
+              }
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {}
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('functionAppName'), 'web')]"
+      ]
+    },
+    {
+      "comments": "Logic App for Stopping Vm's",
+      "type": "Microsoft.Logic/workflows",
+      "name": "[variables('stopVMslogicAppName')]",
+      "apiVersion": "2017-07-01",
+      "location": "[resourceGroup().location]",
+      "tags": {},
+      "scale": null,
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "triggers": {
+            "Schedule_of_when_you_want_the_VM's_to_be_stopped_(Required)": {
+              "recurrence": {
+                "frequency": "Month",
+                "interval": 1
+              },
+              "type": "Recurrence"
+            }
+          },
+          "actions": {
+            "Condition": {
+              "actions": {},
+              "runAfter": {
+                "Function_Body_(Do_not_edit)": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Set_variable": {
+                    "runAfter": {},
+                    "type": "SetVariable",
+                    "inputs": {
+                      "name": "Function Body",
+                      "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('Subscription Id')}\", \"resourceGroupName\":\"@{variables('Resource Group Name')}\"}"
+                    }
+                  }
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "equals": [
+                      "@variables('Resource Group Name')",
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "type": "If"
+            },
+            "Condition_2": {
+              "actions": {},
+              "runAfter": {
+                "Condition": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Set_variable_2": {
+                    "runAfter": {},
+                    "type": "SetVariable",
+                    "inputs": {
+                      "name": "Function Body",
+                      "value": "{\"mode:\"stop\", \"subscriptionId\":\"@{variables('Subscription Id')}\", \"resourceGroupName\":\"@{variables('Resource Group Name')}\", \"tagsToCheck\":\"@{variables('Tags To Check')}\"}"
+                    }
+                  }
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "equals": [
+                      "@variables('Tags To Check')",
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "type": "If"
+            },
+            "Enter_Resource_Group_Name_(Optional)": {
+              "runAfter": {
+                "Enter_Subscription_Id_(Required)": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Resource Group Name",
+                    "type": "String",
+                    "value": ""
+                  }
+                ]
+              }
+            },
+            "Enter_Subscription_Id_(Required)": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Subscription Id",
+                    "type": "String",
+                    "value": ""
+                  }
+                ]
+              }
+            },
+            "Enter_Tags_to_Check_(Optional)": {
+              "runAfter": {
+                "Enter_Resource_Group_Name_(Optional)": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Tags To Check",
+                    "type": "String"
+                  }
+                ]
+              }
+            },
+            "Function_Body_(Do_not_edit)": {
+              "runAfter": {
+                "Enter_Tags_to_Check_(Optional)": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Function Body",
+                    "type": "String",
+                    "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('Subscription Id')}\"}"
                   }
                 ]
               }

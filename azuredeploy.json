@@ -443,7 +443,8 @@
         "parameters": {}
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('functionAppName'), 'web')]"
+        "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('functionAppName'), 'web')]",
+        "[resourceId('Microsoft.Logic/workflows', variables('startVMslogicAppName'))]"
       ]
     }
   ]

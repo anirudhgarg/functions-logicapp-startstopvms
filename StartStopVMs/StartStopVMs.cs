@@ -54,8 +54,7 @@ namespace StartStopVMs
             {
                 return new BadRequestObjectResult(@"subscriptionId and mode are required. Usage: {""subscriptionId"":""<subscriptionid>"", ""mode"":""start|stop"", [""resourceGroupName"":""<resourceGroupName>""], [""tag"":""<tag>""]  ");
             }
-
-            string resultstring = requestBody.ToString();
+            
             int numberOfVmsAffected = 0;
             try
             {
@@ -76,7 +75,7 @@ namespace StartStopVMs
                     if ( (!string.IsNullOrEmpty(tag) && vm.Tags.ContainsKey(tag)) || string.IsNullOrEmpty(tag) )
                     {
                         Task task = null;
-                        if (mode == "start" && (vm.PowerState == PowerState.Stopped || vm.PowerState == PowerState.Deallocated || vm.PowerState == PowerState.Deallocating || vm.PowerState == PowerState.Stopping))
+                        if (mode == "start")
                         {
                             log.LogInformation("Starting vm {0}", vm.Name);
                             resultText.AppendLine(string.Format("Started vm {0}", vm.Name));

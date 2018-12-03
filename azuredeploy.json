@@ -221,13 +221,7 @@
             },
             "Function_Body_(Do_not_edit)": {
               "inputs": {
-                "variables": [
-                  {
-                    "name": "Function Body",
-                    "type": "String",
-                    "value": "{\"mode\":\"start\", \"subscriptionId\":\"\"}"
-                  }
-                ]
+                "value": "{\"mode\":\"start\", \"subscriptionId\":\"@{variables('subscriptionId')}\"}"
               },
               "runAfter": {
                 "Enter_Tags_to_Check_(Optional)": [
@@ -398,7 +392,7 @@
                   {
                     "name": "Function Body",
                     "type": "String",
-                    "value": "{\"mode\":\"stop\", \"subscriptionId\":\"\"}"
+                    "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\"}"
                   }
                 ]
               },

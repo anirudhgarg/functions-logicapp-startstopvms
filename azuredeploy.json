@@ -219,16 +219,22 @@
               },
               "type": "InitializeVariable"
             },
-            "Function_Body_(Do_not_edit)": {
-              "inputs": {
-                "value": "{\"mode\":\"start\", \"subscriptionId\":\"@{variables('subscriptionId')}\"}"
-              },
-              "runAfter": {
-                "Enter_Tags_to_Check_(Optional)": [
-                  "Succeeded"
-                ]
-              },
-              "type": "InitializeVariable"
+             "Function_Body_(Do_not_edit)": {
+                "inputs": {
+                  "variables": [
+                    {
+                      "name": "Function Body",
+                      "type": "String",
+                      "value": "{\"mode\":\"start\", \"subscriptionId\":\"@{variables('subscriptionId')}\"}"
+                    }
+                  ]
+                },
+                "runAfter": {
+                    "Enter_Tags_to_Check_(Optional)": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
             },
             "StartStopVMs": {
               "inputs": {

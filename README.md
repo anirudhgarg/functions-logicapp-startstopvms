@@ -24,7 +24,7 @@ This solution creates an Azure Function and two Azure Logic Apps.
 ### Deployment of Azure Resources
 Click the Deploy to Azure Button, this brings up the dialog below in the Azure Portal, choose the subscription and resource group that you want to create your Azure Function and Logic Apps in. Finally choose the name of the "App". This will be used to create the name of the Function and the Logic Apps.
 
-![Image of Deployment](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/DeploymentScreen.jpgDeploymentScreen.jpg)
+![Image of Deployment](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/DeploymentScreen.jpg)
 
 ### Configuring Logic Apps
 Once deployment is done you will see that several Azure Resources are created. The Start VM and Stop VM functionality is driven through two Logic Apps [AppName]-StartVMs and [AppName]-StopVMs. 

@@ -7,6 +7,16 @@
 <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png"/>
 </a>
 
-This solution allows you to Start/Stop your Azure VM's based on a schedule. It uses Azure Functions and Azure Logic Apps.
+This solution allows you to Start/Stop your Azure VM's based on a schedule. It uses Azure Functions and Azure Logic Apps. 
+
+The folloing functionality is available: 
+
+* Ability to Start and Stop Azure VM's for a given Subscription(required) based on a schedule
+* Ability to filter the VM's based on a Resource Group
+* Ability to filter the VM's based on a Tag 
+
+The implementation uses Azure VM async API's and hence potentially hundreds of VM's can be started/stopped. 
+
+
 
 

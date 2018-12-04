@@ -19,7 +19,9 @@ The implementation uses Azure VM async API's and hence potentially hundreds of V
 
 ## Instructions: 
 
-Click the Deploy Button 
+Click the Deploy Button:
+
+![Image of Deployment](https://github.com/anirudhgarg/functions-logicapps-startstopvms-bytes/blob/master/DeploymentScreen.jpg)
 
 
 

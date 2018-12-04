@@ -17,6 +17,10 @@ The folloing functionality is available:
 
 The implementation uses Azure VM async API's and hence potentially hundreds of VM's can be started/stopped. 
 
+## Instructions: 
+
+Click the Deploy Button 
+
 
 
 

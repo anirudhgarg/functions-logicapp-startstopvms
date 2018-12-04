@@ -7,4 +7,6 @@
 <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png"/>
 </a>
 
+This solution allows you to Start/Stop your Azure VM's based on a schedule. It uses Azure Functions and Azure Logic Apps.
+
 

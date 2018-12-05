@@ -27,7 +27,7 @@ Click the Deploy to Azure Button, this brings up the dialog below in the Azure P
 ![Image of Deployment](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/DeploymentScreen.jpg)
 
 #### Give the required permission to the Functions App MSI 
-The Function App needs permissions on the VM's to perform  the start, stop action on them. The deployment already creates a MSI with the [AppName]. Based on whether you want to want to give permission to this MSI for a whole Subscription, ResoureGroup or even VM's you have  to add the "Virtual Machine Contributor" role assignment to the MSI for it. This can be done in the Azure Portal by navigating to the appropriate scope and then to the "Access Control (IAM)" and click the "Add a role assignment". 
+The Function App needs permissions on the VM's to perform  the start, stop action on them. The deployment already creates a MSI with the [AppName]. Based on whether you want to want to give permission to this MSI for a whole Subscription, ResoureGroup or even VM's you have  to add the "Virtual Machine Contributor" role assignment to the MSI for it. This can be done in the Azure Portal by navigating to the appropriate scope and then to the "Access Control (IAM)" and click the "Add a role assignment". Note that this Subscription/Resource Group/VM's can be in a different Subscription/Resource Group that you have depoyed the app too. 
 
 ![Image of AddRoleAssignment](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Add-RoleAssignment.jpg)
 

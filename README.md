@@ -49,13 +49,13 @@ Click on the first activity where you enter the schedule for when the VM's need 
 
 #### Configure the Azure Subscription, Azure Resource Group (optional) and Tags (optional) 
 
-* SubcriptionId
+* SubcriptionId:
 Click on the Enter SubscriptionId activity and in the Value field enter the Azure Subscription Id that you want to start or stop VM's for (note that the SubscriptionId that you deployed your resources to is already prepopulated, if this is the same Subscription whose VM's you want to Start/Stop then leave that)
 
-* Resource Group
+* Resource Group:
 Optionally, enter the value of a resource group that you want to filter the VM's on by entering a value in the Value field. ((note that the Resource Group that you deployed your resources to is already prepopulated, if this is the same Resource Group whose VM's you want to Start/Stop then leave that else  you could remove the value and leave it blank as well)
 
-* Tags
+* Tags:
 Optionally if you want to filter the VM's by Tags, by entering the appropriate value in the Tags Value field. This will  filter the VM's to only those that have that Tags defined on the VM (with any value).
 
 Note that SubscriptionId is a required field, but both Resource Group and Tags are optional and can be both used or used individually.

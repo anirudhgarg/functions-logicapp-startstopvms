@@ -257,15 +257,23 @@
           "parameters": {},
           "triggers": {
             "Schedule_of_when_you_want_the_VM's_to_be_started_(Required)": {
-              "recurrence": {
-                "frequency": "Minute",
-                "interval": 30,
-                "startTime": "2018-11-22T15:00:00",
-                "timeZone": "Pacific Standard Time"
-              },
-              "type": "Recurrence"
+                "recurrence": {
+                    "frequency": "Day",
+                    "interval": 1,
+                    "schedule": {
+                        "hours": [
+                            "7"
+                        ],
+                        "minutes": [
+                            0
+                        ]
+                    },
+                    "startTime": "2018-12-04T15:00:00",
+                    "timeZone": "Pacific Standard Time"
+                },
+                "type": "Recurrence"
             }
-          }
+        }
         },
         "parameters": {}
       },
@@ -430,15 +438,23 @@
           "parameters": {},
           "triggers": {
             "Schedule_of_when_you_want_the_VM's_to_be_started_(Required)": {
-              "recurrence": {
-                "frequency": "Minute",
-                "interval": 30,
-                "startTime": "2018-11-22T15:00:00",
-                "timeZone": "Pacific Standard Time"
-              },
-              "type": "Recurrence"
+                "recurrence": {
+                    "frequency": "Day",
+                    "interval": 1,
+                    "schedule": {
+                        "hours": [
+                            "19"
+                        ],
+                        "minutes": [
+                            0
+                        ]
+                    },
+                    "startTime": "2018-12-04T15:00:00",
+                    "timeZone": "Pacific Standard Time"
+                },
+                "type": "Recurrence"
             }
-          }
+        }
         },
         "parameters": {}
       },

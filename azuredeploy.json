@@ -180,7 +180,8 @@
                 "variables": [
                   {
                     "name": "resourceGroupName",
-                    "type": "String"
+                    "type": "String",
+                    "value": "[resourceGroup().name]"
                   }
                 ]
               },
@@ -362,7 +363,8 @@
                 "variables": [
                   {
                     "name": "resourceGroupName",
-                    "type": "String"
+                    "type": "String",
+                    "value": "[resourceGroup().name]"
                   }
                 ]
               },
@@ -378,7 +380,8 @@
                 "variables": [
                   {
                     "name": "subscriptionId",
-                    "type": "String"
+                    "type": "String",
+                    "value": "[subscription().subscriptionId]"
                   }
                 ]
               },

@@ -56,7 +56,7 @@ Click on the Enter SubscriptionId activity and in the Value field enter the Azur
 Optionally, enter the value of a resource group that you want to filter the VM's on by entering a value in the Value field. ((note that the Resource Group that you deployed your resources to is already prepopulated, if this is the same Resource Group whose VM's you want to Start/Stop then leave that else  you could remove the value and leave it blank as well)
 
 * Tags:
-Optionally if you want to filter the VM's by Tags, by entering the appropriate value in the Tags Value field. This will  filter the VM's to only those that have that Tags defined on the VM (with any value).
+Optionally, if you want to filter the VM's by Tags, by entering the appropriate value in the Tags Value field. This will  filter the VM's to only those that have that Tags defined on the VM (with any value).
 
 Note that SubscriptionId is a required field, but both Resource Group and Tags are optional and can be both used or used individually.
 

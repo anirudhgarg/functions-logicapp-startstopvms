@@ -29,27 +29,32 @@ Click the Deploy to Azure Button, this brings up the dialog below in the Azure P
 #### Give the required permission to the Functions App MSI 
 The Function App needs permissions on the VM's to perform  the start, stop action on them. The deployment already creates a MSI with the [AppName]. Based on whether you want to want to give permission to this MSI for a whole Subscription, ResoureGroup or even VM's you have  to add the "Virtual Machine Contributor" role assignment to the MSI for it. This can be done in the Azure Portal by navigating to the appropriate scope and then to the "Access Control (IAM)" and click the "Add a role assignment". 
 
-
+![Image of AddRoleAssignment](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Add-RoleAssignment.jpg)
 
 This opens the dialog box for the Add role assignment. Choose the role "Virtual Machine Contributor" and search for the [AppName] in the Select and select the MSI and click Save. This is the way that you can control access. 
 
+![Image of RoleAssignment](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/RoleAssignment.jpg)
 
 ### Configuring Logic Apps
 Once deployment is done you will see that several Azure Resources are created. The Start VM and Stop VM functionality is driven through two Logic Apps [AppName]-StartVMs and [AppName]-StopVMs. 
 
 Navigate to the Logic Apps section of the Azure Portal and find the Logic Apps created. For each of them, Click through the Logic App and click Edit and Click Code View.
 
+![Image of LogicApps](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/LogicAppsScreen.jpg)
+
 #### Configure the Schedule that you want the Start or Stop VM's to take place
 Click on the first activity where you enter the schedule for when the VM's need to be started or stopped
 
+![Image of LogicApps](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Schedule.jpg)
 
 #### Configure the Azure Subscription, Azure Resource Group (optional) and Tags (optional) 
 Click on the Enter SubscriptionId activity and in the Value field enter the Azure Subscription Id that you want to start or stop VM's for, optionally if you want to further filter VM's by Resource Group then enter a value in the Value field. You can further filter the VM's by Tags, by entering the appropriate value in the Tags Value field. This will further filter the VM's to only those that have that Tags defined on the VM (with any value)
 
-
+![Image of LogicApps](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Sub-RG-Tags.jpg)
 
 Once done, save the Logic Apps. Finally go ahead and Enable the Logic Apps.
 
+![Image of LogicApps](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Enable.jpg)
 
 Once enabled, the Logic Apps will trigger on the schedule. You can test out the Logic Apps by clicking on Run Trigger to test out if the functionality works. 
 

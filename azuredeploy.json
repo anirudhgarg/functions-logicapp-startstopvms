@@ -113,17 +113,45 @@
         "definition": {
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
           "actions": {
-            "Condition": {
+            "Condition_(Do_not_edit)": {
               "actions": {},
               "else": {
                 "actions": {
-                  "Set_variable": {
-                    "inputs": {
-                      "name": "Function Body",
-                      "value": "{\"mode\":\"start\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\"}"
+                  "Condition_3": {
+                    "actions": {
+                      "Set_variable_3": {
+                        "inputs": {
+                          "name": "Function Body",
+                          "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\"}"
+                        },
+                        "runAfter": {},
+                        "type": "SetVariable"
+                      }
+                    },
+                    "else": {
+                      "actions": {
+                        "Set_variable_4": {
+                          "inputs": {
+                            "name": "Function Body",
+                            "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\", \"tag\":\"@{variables('Tags To Check')}\"}"
+                          },
+                          "runAfter": {},
+                          "type": "SetVariable"
+                        }
+                      }
+                    },
+                    "expression": {
+                      "and": [
+                        {
+                          "equals": [
+                            "@variables('Tags To Check')",
+                            ""
+                          ]
+                        }
+                      ]
                     },
                     "runAfter": {},
-                    "type": "SetVariable"
+                    "type": "If"
                   }
                 }
               },
@@ -148,13 +176,29 @@
               "actions": {},
               "else": {
                 "actions": {
-                  "Set_variable_2": {
-                    "inputs": {
-                      "name": "Function Body",
-                      "value": "{\"mode:\"start\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\", \"tagsToCheck\":\"@{variables('Tags To Check')}\"}"
+                  "Condition_4": {
+                    "actions": {
+                      "Set_variable": {
+                        "inputs": {
+                          "name": "Function Body",
+                          "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"tag\":\"@{variables('Tags To Check')}\"}"
+                        },
+                        "runAfter": {},
+                        "type": "SetVariable"
+                      }
+                    },
+                    "expression": {
+                      "and": [
+                        {
+                          "equals": [
+                            "@variables('resourceGroupName')",
+                            ""
+                          ]
+                        }
+                      ]
                     },
                     "runAfter": {},
-                    "type": "SetVariable"
+                    "type": "If"
                   }
                 }
               },
@@ -169,7 +213,7 @@
                 ]
               },
               "runAfter": {
-                "Condition": [
+                "Condition_(Do_not_edit)": [
                   "Succeeded"
                 ]
               },
@@ -180,8 +224,7 @@
                 "variables": [
                   {
                     "name": "resourceGroupName",
-                    "type": "String",
-                    "value": "[resourceGroup().name]"
+                    "type": "String"
                   }
                 ]
               },
@@ -198,7 +241,7 @@
                   {
                     "name": "subscriptionId",
                     "type": "String",
-                    "value": "[subscription().subscriptionId]"
+                    "value": "[subscription().subscriptionId]a"
                   }
                 ]
               },
@@ -210,190 +253,8 @@
                 "variables": [
                   {
                     "name": "Tags To Check",
-                    "type": "String"
-                  }
-                ]
-              },
-              "runAfter": {
-                "Enter_Resource_Group_Name_(Optional)": [
-                  "Succeeded"
-                ]
-              },
-              "type": "InitializeVariable"
-            },
-             "Function_Body_(Do_not_edit)": {
-                "inputs": {
-                  "variables": [
-                    {
-                      "name": "Function Body",
-                      "type": "String",
-                      "value": "{\"mode\":\"start\", \"subscriptionId\":\"@{variables('subscriptionId')}\"}"
-                    }
-                  ]
-                },
-                "runAfter": {
-                    "Enter_Tags_to_Check_(Optional)": [
-                        "Succeeded"
-                    ]
-                },
-                "type": "InitializeVariable"
-            },
-            "StartStopVMs": {
-              "inputs": {
-                "body": "@variables('Function Body')",
-                "function": {
-                  "id": "[resourceId('Microsoft.Web/sites/functions', variables('functionAppName'),variables('functionName'))]"
-                },
-                "method": "POST"
-              },
-              "runAfter": {
-                "Condition_2": [
-                  "Succeeded"
-                ]
-              },
-              "type": "Function"
-            }
-          },
-          "contentVersion": "1.0.0.0",
-          "outputs": {},
-          "parameters": {},
-          "triggers": {
-            "Schedule_of_when_you_want_the_VM's_to_be_started_(Required)": {
-                "recurrence": {
-                    "frequency": "Day",
-                    "interval": 1,
-                    "schedule": {
-                        "hours": [
-                            "7"
-                        ],
-                        "minutes": [
-                            0
-                        ]
-                    },
-                    "startTime": "2018-12-04T15:00:00",
-                    "timeZone": "Pacific Standard Time"
-                },
-                "type": "Recurrence"
-            }
-        }
-        },
-        "parameters": {}
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('functionAppName'), 'web')]"
-      ]
-    },
-    {
-      "comments": "Logic App for Stop Vm's",
-      "type": "Microsoft.Logic/workflows",
-      "name": "[variables('stopVMslogicAppName')]",
-      "apiVersion": "2017-07-01",
-      "location": "[resourceGroup().location]",
-      "tags": {},
-      "scale": null,
-      "properties": {
-        "state": "Disabled",
-        "definition": {
-          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-          "actions": {
-            "Condition": {
-              "actions": {},
-              "else": {
-                "actions": {
-                  "Set_variable": {
-                    "inputs": {
-                      "name": "Function Body",
-                      "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\"}"
-                    },
-                    "runAfter": {},
-                    "type": "SetVariable"
-                  }
-                }
-              },
-              "expression": {
-                "and": [
-                  {
-                    "equals": [
-                      "@variables('resourceGroupName')",
-                      ""
-                    ]
-                  }
-                ]
-              },
-              "runAfter": {
-                "Function_Body_(Do_not_edit)": [
-                  "Succeeded"
-                ]
-              },
-              "type": "If"
-            },
-            "Condition_2": {
-              "actions": {},
-              "else": {
-                "actions": {
-                  "Set_variable_2": {
-                    "inputs": {
-                      "name": "Function Body",
-                      "value": "{\"mode:\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\", \"tagsToCheck\":\"@{variables('Tags To Check')}\"}"
-                    },
-                    "runAfter": {},
-                    "type": "SetVariable"
-                  }
-                }
-              },
-              "expression": {
-                "and": [
-                  {
-                    "equals": [
-                      "@variables('Tags To Check')",
-                      ""
-                    ]
-                  }
-                ]
-              },
-              "runAfter": {
-                "Condition": [
-                  "Succeeded"
-                ]
-              },
-              "type": "If"
-            },
-            "Enter_Resource_Group_Name_(Optional)": {
-              "inputs": {
-                "variables": [
-                  {
-                    "name": "resourceGroupName",
                     "type": "String",
-                    "value": "[resourceGroup().name]"
-                  }
-                ]
-              },
-              "runAfter": {
-                "Enter_SubscriptionId_(Required)": [
-                  "Succeeded"
-                ]
-              },
-              "type": "InitializeVariable"
-            },
-            "Enter_SubscriptionId_(Required)": {
-              "inputs": {
-                "variables": [
-                  {
-                    "name": "subscriptionId",
-                    "type": "String",
-                    "value": "[subscription().subscriptionId]"
-                  }
-                ]
-              },
-              "runAfter": {},
-              "type": "InitializeVariable"
-            },
-            "Enter_Tags_to_Check_(Optional)": {
-              "inputs": {
-                "variables": [
-                  {
-                    "name": "Tags To Check",
-                    "type": "String"
+                    "value": "vmmanage"
                   }
                 ]
               },
@@ -442,24 +303,252 @@
           "parameters": {},
           "triggers": {
             "Schedule_of_when_you_want_the_VM's_to_be_started_(Required)": {
-                "recurrence": {
-                    "frequency": "Day",
-                    "interval": 1,
-                    "schedule": {
-                        "hours": [
-                            "19"
-                        ],
-                        "minutes": [
-                            0
+              "recurrence": {
+                "frequency": "Day",
+                "interval": 1,
+                "schedule": {
+                  "hours": [
+                    "19"
+                  ],
+                  "minutes": [
+                    0
+                  ]
+                },
+                "startTime": "2018-12-04T15:00:00",
+                "timeZone": "Pacific Standard Time"
+              },
+              "type": "Recurrence"
+            }
+          }
+        },
+        "parameters": {}
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('functionAppName'), 'web')]"
+      ]
+    },
+    {
+      "comments": "Logic App for Stop Vm's",
+      "type": "Microsoft.Logic/workflows",
+      "name": "[variables('stopVMslogicAppName')]",
+      "apiVersion": "2017-07-01",
+      "location": "[resourceGroup().location]",
+      "tags": {},
+      "scale": null,
+      "properties": {
+        "state": "Disabled",        
+          "definition": {
+            "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+            "actions": {
+              "Condition_(Do_not_edit)": {
+                "actions": {},
+                "else": {
+                  "actions": {
+                    "Condition_3": {
+                      "actions": {
+                        "Set_variable_3": {
+                          "inputs": {
+                            "name": "Function Body",
+                            "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\"}"
+                          },
+                          "runAfter": {},
+                          "type": "SetVariable"
+                        }
+                      },
+                      "else": {
+                        "actions": {
+                          "Set_variable_4": {
+                            "inputs": {
+                              "name": "Function Body",
+                              "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\", \"tag\":\"@{variables('Tags To Check')}\"}"
+                            },
+                            "runAfter": {},
+                            "type": "SetVariable"
+                          }
+                        }
+                      },
+                      "expression": {
+                        "and": [
+                          {
+                            "equals": [
+                              "@variables('Tags To Check')",
+                              ""
+                            ]
+                          }
                         ]
-                    },
-                    "startTime": "2018-12-04T15:00:00",
-                    "timeZone": "Pacific Standard Time"
+                      },
+                      "runAfter": {},
+                      "type": "If"
+                    }
+                  }
+                },
+                "expression": {
+                  "and": [
+                    {
+                      "equals": [
+                        "@variables('resourceGroupName')",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                "runAfter": {
+                  "Function_Body_(Do_not_edit)": [
+                    "Succeeded"
+                  ]
+                },
+                "type": "If"
+              },
+              "Condition_2": {
+                "actions": {},
+                "else": {
+                  "actions": {
+                    "Condition_4": {
+                      "actions": {
+                        "Set_variable": {
+                          "inputs": {
+                            "name": "Function Body",
+                            "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"tag\":\"@{variables('Tags To Check')}\"}"
+                          },
+                          "runAfter": {},
+                          "type": "SetVariable"
+                        }
+                      },
+                      "expression": {
+                        "and": [
+                          {
+                            "equals": [
+                              "@variables('resourceGroupName')",
+                              ""
+                            ]
+                          }
+                        ]
+                      },
+                      "runAfter": {},
+                      "type": "If"
+                    }
+                  }
+                },
+                "expression": {
+                  "and": [
+                    {
+                      "equals": [
+                        "@variables('Tags To Check')",
+                        ""
+                      ]
+                    }
+                  ]
+                },
+                "runAfter": {
+                  "Condition_(Do_not_edit)": [
+                    "Succeeded"
+                  ]
+                },
+                "type": "If"
+              },
+              "Enter_Resource_Group_Name_(Optional)": {
+                "inputs": {
+                  "variables": [
+                    {
+                      "name": "resourceGroupName",
+                      "type": "String"
+                    }
+                  ]
+                },
+                "runAfter": {
+                  "Enter_SubscriptionId_(Required)": [
+                    "Succeeded"
+                  ]
+                },
+                "type": "InitializeVariable"
+              },
+              "Enter_SubscriptionId_(Required)": {
+                "inputs": {
+                  "variables": [
+                    {
+                      "name": "subscriptionId",
+                      "type": "String",
+                      "value": "[subscription().subscriptionId]a"
+                    }
+                  ]
+                },
+                "runAfter": {},
+                "type": "InitializeVariable"
+              },
+              "Enter_Tags_to_Check_(Optional)": {
+                "inputs": {
+                  "variables": [
+                    {
+                      "name": "Tags To Check",
+                      "type": "String",
+                      "value": "vmmanage"
+                    }
+                  ]
+                },
+                "runAfter": {
+                  "Enter_Resource_Group_Name_(Optional)": [
+                    "Succeeded"
+                  ]
+                },
+                "type": "InitializeVariable"
+              },
+              "Function_Body_(Do_not_edit)": {
+                "inputs": {
+                  "variables": [
+                    {
+                      "name": "Function Body",
+                      "type": "String",
+                      "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\"}"
+                    }
+                  ]
+                },
+                "runAfter": {
+                  "Enter_Tags_to_Check_(Optional)": [
+                    "Succeeded"
+                  ]
+                },
+                "type": "InitializeVariable"
+              },
+              "StartStopVMs": {
+                "inputs": {
+                  "body": "@variables('Function Body')",
+                  "function": {
+                    "id": "[resourceId('Microsoft.Web/sites/functions', variables('functionAppName'),variables('functionName'))]"
+                  },
+                  "method": "POST"
+                },
+                "runAfter": {
+                  "Condition_2": [
+                    "Succeeded"
+                  ]
+                },
+                "type": "Function"
+              }
+            },
+            "contentVersion": "1.0.0.0",
+            "outputs": {},
+            "parameters": {},
+            "triggers": {
+              "Schedule_of_when_you_want_the_VM's_to_be_started_(Required)": {
+                "recurrence": {
+                  "frequency": "Day",
+                  "interval": 1,
+                  "schedule": {
+                    "hours": [
+                      "19"
+                    ],
+                    "minutes": [
+                      0
+                    ]
+                  },
+                  "startTime": "2018-12-04T15:00:00",
+                  "timeZone": "Pacific Standard Time"
                 },
                 "type": "Recurrence"
+              }
             }
-        }
-        },
+          }       
+      ,
         "parameters": {}
       },
       "dependsOn": [

@@ -30,24 +30,28 @@ namespace StartStopVMs
             string tag = req.Query["tag"];
             string mode = req.Query["mode"];
             StringBuilder resultText = new StringBuilder();
-           
+            log.LogInformation(req.Body.ToString());
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(requestBody);
             if (data.ContainsKey("mode"))
             {
                 mode = data["mode"];
+                log.LogInformation("mode", mode);
             }
             if (data.ContainsKey("subscriptionId"))
             {
                 subscriptionId = data["subscriptionId"];
+                log.LogInformation("subId", subscriptionId);
             }
             if (data.ContainsKey("resourceGroupName"))
             {
                 resourceGroupName = data["resourceGroupName"];
+                log.LogInformation("resourceGroupName", resourceGroupName);
             }
             if (data.ContainsKey("tag"))
             {
-                tag = data["tag"];
+                tag = data["tag"];               
+                log.LogInformation("tag", tag);
             }           
 
             if(string.IsNullOrEmpty(subscriptionId) || string.IsNullOrEmpty(mode))

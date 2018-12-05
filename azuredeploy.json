@@ -122,7 +122,7 @@
                       "Set_variable_3": {
                         "inputs": {
                           "name": "Function Body",
-                          "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\"}"
+                          "value": "{\"mode\":\"start\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\"}"
                         },
                         "runAfter": {},
                         "type": "SetVariable"
@@ -133,7 +133,7 @@
                         "Set_variable_4": {
                           "inputs": {
                             "name": "Function Body",
-                            "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\", \"tag\":\"@{variables('Tags To Check')}\"}"
+                            "value": "{\"mode\":\"start\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"resourceGroupName\":\"@{variables('resourceGroupName')}\", \"tag\":\"@{variables('Tags To Check')}\"}"
                           },
                           "runAfter": {},
                           "type": "SetVariable"
@@ -181,7 +181,7 @@
                       "Set_variable": {
                         "inputs": {
                           "name": "Function Body",
-                          "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"tag\":\"@{variables('Tags To Check')}\"}"
+                          "value": "{\"mode\":\"start\", \"subscriptionId\":\"@{variables('subscriptionId')}\", \"tag\":\"@{variables('Tags To Check')}\"}"
                         },
                         "runAfter": {},
                         "type": "SetVariable"
@@ -271,7 +271,7 @@
                   {
                     "name": "Function Body",
                     "type": "String",
-                    "value": "{\"mode\":\"stop\", \"subscriptionId\":\"@{variables('subscriptionId')}\"}"
+                    "value": "{\"mode\":\"start\", \"subscriptionId\":\"@{variables('subscriptionId')}\"}"
                   }
                 ]
               },

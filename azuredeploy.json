@@ -224,7 +224,8 @@
                 "variables": [
                   {
                     "name": "resourceGroupName",
-                    "type": "String"
+                    "type": "String",
+                    "value": "[resourceGroup().name]"
                   }
                 ]
               },
@@ -241,7 +242,7 @@
                   {
                     "name": "subscriptionId",
                     "type": "String",
-                    "value": "[subscription().subscriptionId]a"
+                    "value": "[subscription().subscriptionId]"
                   }
                 ]
               },
@@ -254,7 +255,7 @@
                   {
                     "name": "Tags To Check",
                     "type": "String",
-                    "value": "vmmanage"
+                    "value": ""
                   }
                 ]
               },
@@ -308,7 +309,7 @@
                 "interval": 1,
                 "schedule": {
                   "hours": [
-                    "19"
+                    "7"
                   ],
                   "minutes": [
                     0
@@ -451,7 +452,8 @@
                   "variables": [
                     {
                       "name": "resourceGroupName",
-                      "type": "String"
+                      "type": "String",
+                      "value": "[resourceGroup().name]"
                     }
                   ]
                 },
@@ -468,7 +470,7 @@
                     {
                       "name": "subscriptionId",
                       "type": "String",
-                      "value": "[subscription().subscriptionId]a"
+                      "value": "[subscription().subscriptionId]"
                     }
                   ]
                 },
@@ -481,7 +483,7 @@
                     {
                       "name": "Tags To Check",
                       "type": "String",
-                      "value": "vmmanage"
+                      "value": ""
                     }
                   ]
                 },
@@ -529,7 +531,7 @@
             "outputs": {},
             "parameters": {},
             "triggers": {
-              "Schedule_of_when_you_want_the_VM's_to_be_started_(Required)": {
+              "Schedule_of_when_you_want_the_VM's_to_be_stopped_(Required)": {
                 "recurrence": {
                   "frequency": "Day",
                   "interval": 1,

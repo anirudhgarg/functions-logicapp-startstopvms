@@ -196,7 +196,8 @@
                 "variables": [
                   {
                     "name": "subscriptionId",
-                    "type": "String"
+                    "type": "String",
+                    "value": "[subscription().subscriptionId]"
                   }
                 ]
               },

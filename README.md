@@ -48,7 +48,18 @@ Click on the first activity where you enter the schedule for when the VM's need 
 ![Image of LogicApps](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Schedule.jpg)
 
 #### Configure the Azure Subscription, Azure Resource Group (optional) and Tags (optional) 
-Click on the Enter SubscriptionId activity and in the Value field enter the Azure Subscription Id that you want to start or stop VM's for, optionally if you want to further filter VM's by Resource Group then enter a value in the Value field. You can further filter the VM's by Tags, by entering the appropriate value in the Tags Value field. This will further filter the VM's to only those that have that Tags defined on the VM (with any value)
+
+* SubcriptionId:
+Click on the Enter SubscriptionId activity and in the Value field enter the Azure Subscription Id that you want to start or stop VM's for (note that the SubscriptionId that you deployed your resources to is already prepopulated, if this is the same Subscription whose VM's you want to Start/Stop then leave that)
+
+* Resource Group:
+Optionally, enter the value of a resource group that you want to filter the VM's on by entering a value in the Value field. ((note that the Resource Group that you deployed your resources to is already prepopulated, if this is the same Resource Group whose VM's you want to Start/Stop then leave that else  you could remove the value and leave it blank as well)
+
+* Tags:
+Optionally if you want to filter the VM's by Tags, by entering the appropriate value in the Tags Value field. This will  filter the VM's to only those that have that Tags defined on the VM (with any value).
+
+Note that SubscriptionId is a required field, but both Resource Group and Tags are optional and can be both used or used individually.
+
 
 ![Image of LogicApps](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Sub-RG-Tags.jpg)
 
@@ -57,6 +68,8 @@ Once done, save the Logic Apps. Finally go ahead and Enable the Logic Apps.
 ![Image of LogicApps](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Enable.jpg)
 
 Once enabled, the Logic Apps will trigger on the schedule. You can test out the Logic Apps by clicking on Run Trigger to test out if the functionality works. 
+
+### Output
 
 ### Troubleshooting
 

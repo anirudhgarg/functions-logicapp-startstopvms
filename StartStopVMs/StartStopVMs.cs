@@ -1,117 +1,100 @@
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
-using Microsoft.Rest;
-using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.Fluent;
+using Microsoft.Azure.Management.ResourceManager.Fluent;
+using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using Microsoft.Azure.Services.AppAuthentication;
-using System.Collections.Generic;
-using Microsoft.Azure.Management.Compute.Fluent;
-using System.Text;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
+using Microsoft.Rest;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace StartStopVMs
-{    
+{
     public static class StartStopVMs
     {
         [FunctionName("StartStopVMs")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req, ILogger log)
+        public static async Task Run([OrchestrationTrigger] DurableOrchestrationContext startStopVMContext)
         {
-            string subscriptionId = req.Query["subscriptionId"];
-            string resourceGroupName = req.Query["resourceGroupName"];
-            string tag = req.Query["tag"];
-            string mode = req.Query["mode"];
-            StringBuilder resultText = new StringBuilder();
-            log.LogInformation(req.Body.ToString());
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(requestBody);
-            if (data.ContainsKey("mode"))
-            {
-                mode = data["mode"];
-                log.LogInformation("mode", mode);
-            }
-            if (data.ContainsKey("subscriptionId"))
-            {
-                subscriptionId = data["subscriptionId"];
-                log.LogInformation("subId", subscriptionId);
-            }
-            if (data.ContainsKey("resourceGroupName"))
-            {
-                resourceGroupName = data["resourceGroupName"];
-                log.LogInformation("resourceGroupName", resourceGroupName);
-            }
-            if (data.ContainsKey("tag"))
-            {
-                tag = data["tag"];               
-                log.LogInformation("tag", tag);
-            }           
+            Dictionary<string, string> data = startStopVMContext.GetInput<Dictionary<string, string>>();                    
+            string subscriptionId = data.ContainsKey("subscriptionId") ? data["subscriptionId"] : string.Empty;
+            string mode = data.ContainsKey("mode") ? data["mode"] : string.Empty;
+            string resourceGroupName = data.ContainsKey("resourceGroupName") ? data["resourceGroupName"] : string.Empty;
+            string tag = data.ContainsKey("tag") ? data["tag"] : string.Empty;
+            string batchsize = data.ContainsKey("batchsize") ? data["batchsize"] : "10";
 
-            if(string.IsNullOrEmpty(subscriptionId) || string.IsNullOrEmpty(mode))
+            batchsize = "3";
+            string[] vmlist = await startStopVMContext.CallActivityAsync<string[]>("GetVMList", (subscriptionId, resourceGroupName, tag));
+            int batch = Int32.Parse(batchsize);
+            List<Task> tasks = new List<Task>();
+            for (int i=0; i<vmlist.Length; i=i+batch)
             {
-                return new BadRequestObjectResult(@"subscriptionId and mode are required. Usage: {""subscriptionId"":""<subscriptionid>"", ""mode"":""start|stop"", [""resourceGroupName"":""<resourceGroupName>""], [""tag"":""<tag>""]  ");
-            }
-            
-            int numberOfVmsAffected = 0;
-            try
-            {
-                string token = Authenticate().Result;
-                AzureCredentials credentials = new AzureCredentials(new TokenCredentials(token), new TokenCredentials(token), string.Empty, AzureEnvironment.AzureGlobalCloud);
-                //subscriptionId: 4dda6ad2-730a-4053-88d1-0fa7ff209aea
-                //resourceGroupName: 
-                var azure = Azure.Configure().WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic).Authenticate(credentials).WithSubscription(subscriptionId);
-           
-            
-                var vmList = !string.IsNullOrEmpty(resourceGroupName)
-                    ? azure.VirtualMachines.ListByResourceGroup(resourceGroupName)
-                    : azure.VirtualMachines.List();
-
-                List<Task> tasks = new List<Task>();               
-                foreach (var vm in vmList)
-                {                   
-                    if ( (!string.IsNullOrEmpty(tag) && vm.Tags.ContainsKey(tag)) || string.IsNullOrEmpty(tag) )
-                    {
-                        Task task = null;
-                        if (mode == "start")
-                        {
-                            log.LogInformation("Starting vm {0}", vm.Name);
-                            resultText.AppendLine(string.Format("Started vm {0}", vm.Name));
-                            numberOfVmsAffected++;
-                            task =  vm.StartAsync();
-                        }
-                        else if (mode == "stop")
-                        {
-                            log.LogInformation("Stopping vm {0}", vm.Name);
-                            resultText.AppendLine(string.Format("Stopped vm {0}", vm.Name));
-                            numberOfVmsAffected++;
-                            task =  vm.DeallocateAsync();
-                        }
-                        if(task != null) tasks.Add(task);
-                    }
-                }                    
-           
-                foreach (Task task in tasks)
+                List<string> batchvmlist = new List<string>();
+                batchvmlist.Add(mode);
+                batchvmlist.Add(subscriptionId);
+                for(int j=0; j<batch; j++)
                 {
-                    await task;
+                    if ((i + j) < vmlist.Length)
+                    {
+                        batchvmlist.Add(vmlist[i + j]);
+                    }
                 }
-
+                tasks.Add(startStopVMContext.CallActivityAsync<string[]>("StartStopVMList", batchvmlist.ToArray()));
             }
-            catch (Exception ex)
-            {
-                return new BadRequestObjectResult(string.Format("Invocation failed with exception: {0}", ex.Message));
-            }
-
-            resultText.Insert(0, string.Format("Numbers of VM's affected {0}{1}", numberOfVmsAffected, System.Environment.NewLine));
-            return new OkObjectResult($"{resultText.ToString()}");                
+            await Task.WhenAll(tasks);
         }
-      
+
+        [FunctionName("GetVMList")]
+        public static string[] GetVMList([ActivityTrigger] DurableActivityContext inputs, ILogger log)
+        {
+            List<string> vmListNames = new List<string>();
+            (string subscriptionId, string resourceGroupName, string tag) inputInfo = inputs.GetInput<(string, string, string)>();
+            string token = Authenticate().Result;
+            AzureCredentials credentials = new AzureCredentials(new TokenCredentials(token), new TokenCredentials(token), string.Empty, AzureEnvironment.AzureGlobalCloud);
+            //subscriptionId: 4dda6ad2-730a-4053-88d1-0fa7ff209aea
+            //resourceGroupName: 
+            var azure = Azure.Configure().WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic).Authenticate(credentials).WithSubscription(inputInfo.subscriptionId);
+
+            var vmList = !string.IsNullOrEmpty(inputInfo.resourceGroupName)
+                ? azure.VirtualMachines.ListByResourceGroup(inputInfo.resourceGroupName)
+                : azure.VirtualMachines.List();
+            
+            foreach (var vm in vmList)
+            {
+                if ((!string.IsNullOrEmpty(inputInfo.tag) && vm.Tags.ContainsKey(inputInfo.tag)) || string.IsNullOrEmpty(inputInfo.tag))
+                {
+                    vmListNames.Add(vm.Id);
+                }
+            }
+            return vmListNames.ToArray();
+        }
+
+        [FunctionName("StartStopVMList")]
+        public static async Task StartStopVMList([ActivityTrigger] DurableActivityContext vmlist, ILogger log)
+        {            
+            string[] vmlistNames = vmlist.GetInput<string[]>();
+            string token = Authenticate().Result;
+            AzureCredentials credentials = new AzureCredentials(new TokenCredentials(token), new TokenCredentials(token), string.Empty, AzureEnvironment.AzureGlobalCloud);
+            //subscriptionId: 4dda6ad2-730a-4053-88d1-0fa7ff209aea
+            //resourceGroupName: 
+            var azure = Azure.Configure().WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic).Authenticate(credentials).WithSubscription(vmlistNames[1]);
+            log.LogInformation("***********Logging In**********");
+            for (int i = 2; i < vmlistNames.Length; i++)
+            {                
+                if (vmlistNames[0] == "start")
+                {
+                    log.LogInformation("Starting vm {0}", vmlistNames[i]);
+                    await azure.VirtualMachines.GetById(vmlistNames[i]).StartAsync();
+                }
+                else if (vmlistNames[0] == "stop")
+                {
+                    log.LogInformation("Stopping vm {0}", vmlistNames[i]);
+                    await azure.VirtualMachines.GetById(vmlistNames[i]).DeallocateAsync();
+                }
+            }            
+        }
+
         public static async Task<string> Authenticate()
         {
             var azureServiceTokenProvider = new AzureServiceTokenProvider();

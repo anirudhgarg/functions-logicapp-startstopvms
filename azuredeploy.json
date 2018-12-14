@@ -381,7 +381,7 @@
                   {
                     "name": "resourceGroupName",
                     "type": "String",
-                    "value": "wcus-rg"
+                    "value": ""
                   }
                 ]
               },

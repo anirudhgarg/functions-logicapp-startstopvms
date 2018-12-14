@@ -15,7 +15,7 @@ The following functionality is available:
 * Ability to filter the VM's based on a Resource Group
 * Ability to filter the VM's based on a Tag 
 
-The implementation uses Azure VM async API's and hence potentially hundreds of VM's can be started/stopped. 
+The implementation uses Azure VM async API's and Azure Functions Durable Functions. The number of VM's that are handled by a single Function can be controlled.
 
 ## Instructions: 
 

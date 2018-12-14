@@ -320,7 +320,7 @@
           "outputs": {},
           "parameters": {},
           "triggers": {
-            "Schedule_of_when_you_want_the_VM's_to_be_stopped_(Required)": {
+            "Schedule_of_when_you_want_the_VM's_to_be_started_(Required)": {
               "recurrence": {
                 "frequency": "Day",
                 "interval": 1,

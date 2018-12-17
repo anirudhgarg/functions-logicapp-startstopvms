@@ -16,11 +16,33 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure.Management.Storage.Fluent;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace StartStopVMs
 {
+    public class StartStopVMEntry : TableEntity
+    {
+        public StartStopVMEntry(string skey, string datetime)
+        {
+            this.PartitionKey = skey;
+            this.RowKey = datetime;
+        }
+        
+        public string VMName { get; set; }
+
+        public string VMType { get; set; }
+
+        public string VMStartedOrStopped { get; set; }
+    }
+
     public static class StartStopVMs
     {
+        static CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
+        static CloudTableClient cloudTableClient = storageAccount.CreateCloudTableClient();
+        static CloudTable table = cloudTableClient.GetTableReference("StartStopVMs");
+
         [FunctionName("StartStopVMsDurable")]
         public static async Task<string> Run([OrchestrationTrigger] DurableOrchestrationContext startStopVMContext)
         {
@@ -101,6 +123,7 @@ namespace StartStopVMs
             AzureCredentials credentials = new AzureCredentials(new TokenCredentials(token), new TokenCredentials(token), string.Empty, AzureEnvironment.AzureGlobalCloud);            
             var azure = Azure.Configure().WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic).Authenticate(credentials).WithSubscription(vmlistNames[1]);            
             List<Task> tasks = new List<Task>();
+
             for (int i = 2; i < vmlistNames.Length; i++)
             {                
                 if (vmlistNames[0] == "start")
@@ -108,16 +131,30 @@ namespace StartStopVMs
                     log.LogInformation("Starting vm {0}", vmlistNames[i]);
                     tasks.Add(azure.VirtualMachines.GetById(vmlistNames[i]).StartAsync());
                     resultText.AppendLine(string.Format("Started vm {0}", vmlistNames[i].Split('/')[8]));
+                    InsertRow(vmlistNames[i], "start");
                 }
                 else if (vmlistNames[0] == "stop")
                 {
                     log.LogInformation("Stopping vm {0}", vmlistNames[i]);
                     tasks.Add(azure.VirtualMachines.GetById(vmlistNames[i]).DeallocateAsync());
                     resultText.AppendLine(string.Format("Stopped vm {0}", vmlistNames[i].Split('/')[8]));
+                    InsertRow(vmlistNames[i], "stop");
                 }
-            }
+            }      
+
             await Task.WhenAll(tasks);
             return resultText.ToString();
+        }
+             
+        public static void InsertRow(string vmResourceName, string mode)
+        {           
+            table.CreateIfNotExistsAsync();
+            string partitionKey = string.Format("{0}:{1}", vmResourceName.Split('/')[2], vmResourceName.Split('/')[4]);
+            var entry = new StartStopVMEntry(partitionKey, String.Format("{0:d21}{1}{2}", DateTimeOffset.MaxValue.UtcDateTime.Ticks - new DateTimeOffset(DateTime.Now).UtcDateTime.Ticks, "-", Guid.NewGuid().ToString()));
+            entry.VMName = vmResourceName.Split('/')[8];
+            entry.VMType = "";
+            entry.VMStartedOrStopped = mode;
+            table.ExecuteAsync(TableOperation.Insert(entry));            
         }
 
         /// <summary>

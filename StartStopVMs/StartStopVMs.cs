@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Management.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
@@ -11,12 +10,10 @@ using Microsoft.Rest;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Azure.Management.Storage.Fluent;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -24,9 +21,9 @@ namespace StartStopVMs
 {
     public class StartStopVMEntry : TableEntity
     {
-        public StartStopVMEntry(string skey, string datetime)
+        public StartStopVMEntry(string pkey, string datetime)
         {
-            this.PartitionKey = skey;
+            this.PartitionKey = pkey;
             this.RowKey = datetime;
         }
         
@@ -41,7 +38,7 @@ namespace StartStopVMs
     {
         static CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
         static CloudTableClient cloudTableClient = storageAccount.CreateCloudTableClient();
-        static CloudTable table = cloudTableClient.GetTableReference("StartStopVMs");
+        static CloudTable table = cloudTableClient.GetTableReference("StartStopVMs");      
 
         [FunctionName("StartStopVMsDurable")]
         public static async Task<string> Run([OrchestrationTrigger] DurableOrchestrationContext startStopVMContext)
@@ -59,10 +56,12 @@ namespace StartStopVMs
             List<Task<string>> tasks = new List<Task<string>>();
             for (int i=0; i<vmlist.Length; i=i+batch)
             {
-                List<string> batchvmlist = new List<string>();
-                batchvmlist.Add(mode);
-                batchvmlist.Add(subscriptionId);
-                for(int j=0; j<batch; j++)
+                var batchvmlist = new List<string>
+                {
+                    mode,
+                    subscriptionId
+                };
+                for (int j=0; j<batch; j++)
                 {
                     if ((i + j) < vmlist.Length)
                     {
@@ -149,11 +148,14 @@ namespace StartStopVMs
         public static void InsertRow(string vmResourceName, string mode)
         {           
             table.CreateIfNotExistsAsync();
+            //write it in the form of <subscriptionId>:<resourceGroupName>
             string partitionKey = string.Format("{0}:{1}", vmResourceName.Split('/')[2], vmResourceName.Split('/')[4]);
-            var entry = new StartStopVMEntry(partitionKey, String.Format("{0:d21}{1}{2}", DateTimeOffset.MaxValue.UtcDateTime.Ticks - new DateTimeOffset(DateTime.Now).UtcDateTime.Ticks, "-", Guid.NewGuid().ToString()));
-            entry.VMName = vmResourceName.Split('/')[8];
-            entry.VMType = "";
-            entry.VMStartedOrStopped = mode;
+            var entry = new StartStopVMEntry(partitionKey, string.Format("{0:d21}{1}{2}", DateTimeOffset.MaxValue.UtcDateTime.Ticks - new DateTimeOffset(x).UtcDateTime.Ticks, "-", Guid.NewGuid().ToString()))
+            {
+                VMName = vmResourceName.Split('/')[8],
+                VMType = "",
+                VMStartedOrStopped = mode
+            };
             table.ExecuteAsync(TableOperation.Insert(entry));            
         }
 

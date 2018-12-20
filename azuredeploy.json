@@ -19,8 +19,7 @@
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
     "startVMslogicAppName": "[concat(parameters('appName'), '-StartVMs')]",
     "stopVMslogicAppName": "[concat(parameters('appName'), '-StopVMs')]",
-    "office365StartVMConnectionName": "[concat(parameters('appName'), '-StartVMs')]",
-    "office365StopVMConnectionName": "[concat(parameters('appName'), '-StopVMs')]"
+    "office365ConnectionName": "[concat(parameters('appName'), '-Connection')]"    
   },
   "resources": [
     {
@@ -420,8 +419,8 @@
             "value": {
               "office365": {
                 "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'office365')]",
-                "connectionId": "[resourceId('Microsoft.Web/connections', variables('office365StartVMConnectionName'))]",
-                "connectionName": "[variables('office365StartVMConnectionName')]"
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('office365ConnectionName'))]",
+                "connectionName": "[variables('office365ConnectionName')]"
               }
             }
           }
@@ -429,7 +428,7 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('functionAppName'), 'web')]",
-        "[resourceId('Microsoft.Web/connections', variables('office365StartVMConnectionName'))]"
+        "[resourceId('Microsoft.Web/connections', variables('office365ConnectionName'))]"
       ]
     },
     {
@@ -750,8 +749,8 @@
             "value": {
               "office365": {
                 "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'office365')]",
-                "connectionId": "[resourceId('Microsoft.Web/connections', variables('office365StopVMConnectionName'))]",
-                "connectionName": "[variables('office365StarVMConnectionName')]"
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('office365ConnectionName'))]",
+                "connectionName": "[variables('office365ConnectionName')]"
               }
             }
           }
@@ -760,13 +759,13 @@
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('functionAppName'), 'web')]",
         "[resourceId('Microsoft.Logic/workflows', variables('startVMslogicAppName'))]",
-        "[resourceId('Microsoft.Web/connections', variables('office365StopVMConnectionName'))]"
+        "[resourceId('Microsoft.Web/connections', variables('office365ConnectionName'))]"
       ]
     },
     {
       "type": "MICROSOFT.WEB/CONNECTIONS",
       "apiVersion": "2016-06-01",
-      "name": "[variables('office365StartVMConnectionName')]",
+      "name": "[variables('office365ConnectionName')]",
       "location": "[resourceGroup().location]",
       "properties": {
         "api": {
@@ -774,18 +773,8 @@
         },
         "displayName": "Office 365"
       }
-    },
-    {
-      "type": "MICROSOFT.WEB/CONNECTIONS",
-      "apiVersion": "2016-06-01",
-      "name": "[variables('office365StopVMConnectionName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "api": {
-          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'office365')]"
-        },
-        "displayName": "Office 365"
-      }
+    }
+    
     }
   ]
     }

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Rest;
 using Newtonsoft.Json;
 using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -81,7 +82,7 @@ namespace StartStopVMs
                     array.Add(new JObject(new JProperty("VmName", vmName), new JProperty("Mode", mode)));
                 }
             }
-            return array.ToString();
+            return Regex.Replace(array.ToString(), @"\t|\n|\r", ""); 
         }
 
         [FunctionName("GetVMList")]

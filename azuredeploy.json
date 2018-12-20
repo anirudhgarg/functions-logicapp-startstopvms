@@ -18,7 +18,9 @@
     "storageAccountName": "[concat('storage', uniquestring(resourceGroup().id))]",
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
     "startVMslogicAppName": "[concat(parameters('appName'), '-StartVMs')]",
-    "stopVMslogicAppName": "[concat(parameters('appName'), '-StopVMs')]"
+    "stopVMslogicAppName": "[concat(parameters('appName'), '-StopVMs')]",
+    "office365StartVMConnectionName": "[concat(parameters('appName'), '-StartVMs')]",
+    "office365StopVMConnectionName": "[concat(parameters('appName'), '-StopVMs')]"
   },
   "resources": [
     {
@@ -113,6 +115,40 @@
         "definition": {
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
           "actions": {
+            "Create_HTML_table": {
+              "inputs": {
+                "format": "HTML",
+                "from": "@body('Parse_JSON')?['output']"
+              },
+              "runAfter": {
+                "Parse_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Table"
+            },
+            "Send_an_email": {
+              "inputs": {
+                "body": {
+                  "Body": "@body('Create_HTML_table')",
+                  "Subject": "Started VMs",
+                  "To": "somebody@example.com"
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['office365']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "path": "/Mail"
+              },
+              "runAfter": {
+                "Create_HTML_table": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection"
+            },
             "Enter_Batch_Size_(Optional)": {
               "inputs": {
                 "variables": [
@@ -268,6 +304,41 @@
               },
               "type": "Function"
             },
+            "Parse_JSON": {
+              "inputs": {
+                "content": "@body('StartStopVMs')",
+                "schema": {
+                  "properties": {
+                    "createdTime": {
+                      "type": "string"
+                    },
+                    "customStatus": {},
+                    "input": {
+                      "type": "string"
+                    },
+                    "instanceId": {
+                      "type": "string"
+                    },
+                    "lastUpdatedTime": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    },
+                    "runtimeStatus": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "runAfter": {
+                "StartStopVMs": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson"
+            },
             "Tags_Condition": {
               "actions": {},
               "else": {
@@ -339,10 +410,21 @@
             }
           }
         },
-        "parameters": {}
+        "parameters": {
+          "$connections": {
+            "value": {
+              "office365": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'office365')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('office365StartVMConnectionName'))]",
+                "connectionName": "[variables('office365StartVMConnectionName')]"
+              }
+            }
+          }
+        }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('functionAppName'), 'web')]"
+        "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('functionAppName'), 'web')]",
+        "[resourceId('Microsoft.Web/connections', variables('office365StartVMConnectionName'))]"
       ]
     },
     {
@@ -358,6 +440,40 @@
         "definition": {
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
           "actions": {
+            "Create_HTML_table": {
+              "inputs": {
+                "format": "HTML",
+                "from": "@body('Parse_JSON')?['output']"
+              },
+              "runAfter": {
+                "Parse_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Table"
+            },
+            "Send_an_email": {
+              "inputs": {
+                "body": {
+                  "Body": "@body('Create_HTML_table')",
+                  "Subject": "Stopped VMs",
+                  "To": "somebody@example.com"
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['office365']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "path": "/Mail"
+              },
+              "runAfter": {
+                "Create_HTML_table": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection"
+            },
             "Enter_Batch_Size_(Optional)": {
               "inputs": {
                 "variables": [
@@ -513,6 +629,41 @@
               },
               "type": "Function"
             },
+            "Parse_JSON": {
+              "inputs": {
+                "content": "@body('StartStopVMs')",
+                "schema": {
+                  "properties": {
+                    "createdTime": {
+                      "type": "string"
+                    },
+                    "customStatus": {},
+                    "input": {
+                      "type": "string"
+                    },
+                    "instanceId": {
+                      "type": "string"
+                    },
+                    "lastUpdatedTime": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    },
+                    "runtimeStatus": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "runAfter": {
+                "StartStopVMs": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson"
+            },
             "Tags_Condition": {
               "actions": {},
               "else": {
@@ -583,14 +734,48 @@
               "type": "Recurrence"
             }
           }
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "office365": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'office365')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('office365StopVMConnectionName'))]",
+                "connectionName": "[variables('office365StopVMConnectionName')]"
+              }
+            }
+          }
         }
-        ,
-        "parameters": {}
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('functionAppName'), 'web')]",
-        "[resourceId('Microsoft.Logic/workflows', variables('startVMslogicAppName'))]"
+        "[resourceId('Microsoft.Logic/workflows', variables('startVMslogicAppName'))]",
+        "[resourceId('Microsoft.Web/connections', variables('office365StopVMConnectionName'))]"
       ]
+    },
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('office365StartVMConnectionName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'office365')]"
+        },
+        "displayName": "Office 365"
+      }
+    },
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('office365StopVMConnectionName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'office365')]"
+        },
+        "displayName": "Office 365"
+      }
     }
   ]
     }

@@ -1,6 +1,5 @@
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
-using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Rest;
 using Newtonsoft.Json;
 using System;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -16,7 +14,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using Newtonsoft.Json.Linq;
 using Microsoft.Azure.Management.Compute.Fluent;
 
 namespace StartStopVMs

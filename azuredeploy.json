@@ -19,7 +19,7 @@
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
     "startVMslogicAppName": "[concat(parameters('appName'), '-StartVMs')]",
     "stopVMslogicAppName": "[concat(parameters('appName'), '-StopVMs')]",
-    "office365ConnectionName": "[concat(parameters('appName'), '-Connection')]"    
+    "office365ConnectionName": "[concat(parameters('appName'), '-Connection')]"
   },
   "resources": [
     {
@@ -774,9 +774,7 @@
         "displayName": "Office 365"
       }
     }
-    
-    }
   ]
-    }
+}
 
  

@@ -64,11 +64,9 @@ Note that SubscriptionId is a required field, but both Resource Group and Tags a
 
 Next, update the Office 365 connection (If you dont have a Office 365 connection, you can use SendGrid, if you dont want email you can even remove this step)
 
-![Image of LogicApps](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Sub-RG-Tags.jpg)
+![Image of Email](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Send-Email.jpg)
 
 Once done, save the Logic Apps. Finally go ahead and Enable the Logic Apps.
-
-![Image of Email](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Send-Email.jpg)
 
 Once enabled, the Logic Apps will trigger on the schedule. You can test out the Logic Apps by clicking on Run Trigger to test out if the functionality works. 
 

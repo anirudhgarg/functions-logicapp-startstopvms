@@ -40,30 +40,30 @@ namespace StartStopVMs
     {
         static CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
         static CloudTableClient cloudTableClient = storageAccount.CreateCloudTableClient();
-        static CloudTable table = cloudTableClient.GetTableReference("StartStopVMs");      
+        static CloudTable table = cloudTableClient.GetTableReference("StartStopVMs");
 
         [FunctionName("StartStopVMsDurable")]
         public static async Task<string> Run([OrchestrationTrigger] DurableOrchestrationContext startStopVMContext)
         {
             string inputData = startStopVMContext.GetInput<string>();
-            var data = JsonConvert.DeserializeObject <Dictionary<string, string>>(inputData);
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(inputData);
             string subscriptionId = data.ContainsKey("subscriptionId") ? data["subscriptionId"] : string.Empty;
             string mode = data.ContainsKey("mode") ? data["mode"] : string.Empty;
             string resourceGroupName = data.ContainsKey("resourceGroupName") ? data["resourceGroupName"] : string.Empty;
             string tag = data.ContainsKey("tag") ? data["tag"] : string.Empty;
             string batchsize = data.ContainsKey("batchsize") ? data["batchsize"] : "10";
-            string[] vmlist;           
-            vmlist = await startStopVMContext.CallActivityAsync<string[]>("GetVMList", (subscriptionId, resourceGroupName, tag));                     
+            string[] vmlist;
+            vmlist = await startStopVMContext.CallActivityAsync<string[]>("GetVMList", (subscriptionId, resourceGroupName, tag));
             int batch = Int32.Parse(batchsize);
             List<Task<string>> tasks = new List<Task<string>>();
-            for (int i=0; i<vmlist.Length; i=i+batch)
+            for (int i = 0; i < vmlist.Length; i = i + batch)
             {
                 var batchvmlist = new List<string>
                 {
                     mode,
                     subscriptionId
                 };
-                for (int j=0; j<batch; j++)
+                for (int j = 0; j < batch; j++)
                 {
                     if ((i + j) < vmlist.Length)
                     {
@@ -74,16 +74,19 @@ namespace StartStopVMs
             }
             await Task.WhenAll(tasks);
 
-            var array = new JArray();
+            var builder = new StringBuilder();
+            builder.AppendLine(string.Format("A total of {0} Virtual Machines were {1} in this run.", vmlist.Length, mode == "start" ? "started" : "stopped"));
+            builder.AppendLine();
+            builder.AppendLine("These were the names of the Virtual Machines:");
             foreach (Task<string> task in tasks)
             {
-                foreach(string vmName in task.Result.Split(','))
+                foreach (string vmName in task.Result.Split(','))
                 {
-                    array.Add(new JObject(new JProperty("VmName", vmName), new JProperty("Mode", mode)));
-                }
+                    builder.AppendLine(vmName);
+                }               
             }
-            return Regex.Replace(array.ToString(), @"\t|\n|\r", ""); 
-        }
+            return builder.ToString();
+        }        
 
         [FunctionName("GetVMList")]
         public static string[] GetVMList([ActivityTrigger] DurableActivityContext inputs, ILogger log)

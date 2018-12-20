@@ -101,23 +101,11 @@
         "state": "Disabled",
         "definition": {
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-          "actions": {
-            "Create_HTML_table": {
-              "inputs": {
-                "format": "HTML",
-                "from": "@body('Parse_JSON')?['output']"
-              },
-              "runAfter": {
-                "Parse_JSON": [
-                  "Succeeded"
-                ]
-              },
-              "type": "Table"
-            },
+          "actions": {          
             "Send_an_email": {
               "inputs": {
                 "body": {
-                  "Body": "@body('Create_HTML_table')",
+                  "Body": "@body('Parse_JSON')?['output']",
                   "Subject": "Started VMs",
                   "To": "somebody@example.com"
                 },
@@ -130,7 +118,7 @@
                 "path": "/Mail"
               },
               "runAfter": {
-                "Create_HTML_table": [
+                "Parse_JSON": [
                   "Succeeded"
                 ]
               },
@@ -431,23 +419,11 @@
         "state": "Disabled",
         "definition": {
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-          "actions": {
-            "Create_HTML_table": {
-              "inputs": {
-                "format": "HTML",
-                "from": "@body('Parse_JSON')?['output']"
-              },
-              "runAfter": {
-                "Parse_JSON": [
-                  "Succeeded"
-                ]
-              },
-              "type": "Table"
-            },
+          "actions": {          
             "Send_an_email": {
               "inputs": {
                 "body": {
-                  "Body": "@body('Create_HTML_table')",
+                  "Body": "@body('Parse_JSON')?['output']",
                   "Subject": "Stopped VMs",
                   "To": "somebody@example.com"
                 },
@@ -460,7 +436,7 @@
                 "path": "/Mail"
               },
               "runAfter": {
-                "Create_HTML_table": [
+                "Parse_JSON": [
                   "Succeeded"
                 ]
               },

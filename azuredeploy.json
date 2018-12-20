@@ -389,7 +389,12 @@
           },
           "contentVersion": "1.0.0.0",
           "outputs": {},
-          "parameters": {},
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            }
+          },
           "triggers": {
             "Schedule_of_when_you_want_the_VM's_to_be_started_(Required)": {
               "recurrence": {
@@ -714,7 +719,12 @@
           },
           "contentVersion": "1.0.0.0",
           "outputs": {},
-          "parameters": {},
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            }
+          },
           "triggers": {
             "Schedule_of_when_you_want_the_VM's_to_be_stopped_(Required)": {
               "recurrence": {
@@ -741,7 +751,7 @@
               "office365": {
                 "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'office365')]",
                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('office365StopVMConnectionName'))]",
-                "connectionName": "[variables('office365StopVMConnectionName')]"
+                "connectionName": "[variables('office365StarVMConnectionName')]"
               }
             }
           }

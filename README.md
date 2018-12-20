@@ -62,7 +62,7 @@ Note that SubscriptionId is a required field, but both Resource Group and Tags a
 
 ![Image of LogicApps](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Sub-RG-Tags.jpg)
 
-Next, update the Office 365 connection (If you dont have a Office 365 connection, you can use SendGrid, if you dont want email you can even remove this step)
+Next, update the Office 365 connection (If you dont have a Office 365 connection, you can use SendGrid, if you dont want email you can even remove this step) and put in the email address you want to send a report to whenever the logic app runs.
 
 ![Image of Email](https://github.com/anirudhgarg/functions-logicapp-startstopvms/blob/master/StartStopVMs/images/Send-Email.jpg)
 

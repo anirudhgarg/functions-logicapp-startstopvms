@@ -9,18 +9,6 @@
       }
     }
   },
-  "variables": {
-    "functionAppName": "[parameters('appName')]",
-    "functionName": "StartStopVMs",
-    "hostingPlanName": "[concat(parameters('appName'), '-plan')]",
-    "repoURL": "https://github.com/anirudhgarg/functions-logicapps-startstopvms-bytes.git",
-    "branch": "master",
-    "storageAccountName": "[concat('storage', uniquestring(resourceGroup().id))]",
-    "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-    "startVMslogicAppName": "[concat(parameters('appName'), '-StartVMs')]",
-    "stopVMslogicAppName": "[concat(parameters('appName'), '-StopVMs')]",
-    "office365ConnectionName": "[concat(parameters('appName'), '-Connection')]"
-  },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
@@ -774,7 +762,19 @@
         "displayName": "Office 365"
       }
     }
-  ]
+  ],
+  "variables": {
+    "functionAppName": "[parameters('appName')]",
+    "functionName": "StartStopVMs",
+    "hostingPlanName": "[concat(parameters('appName'), '-plan')]",
+    "repoURL": "https://github.com/anirudhgarg/functions-logicapps-startstopvms-bytes.git",
+    "branch": "master",
+    "storageAccountName": "[concat('storage', uniquestring(resourceGroup().id))]",
+    "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+    "startVMslogicAppName": "[concat(parameters('appName'), '-StartVMs')]",
+    "stopVMslogicAppName": "[concat(parameters('appName'), '-StopVMs')]",
+    "office365ConnectionName": "[concat(parameters('appName'), '-Connection')]"
+  }
 }
 
  

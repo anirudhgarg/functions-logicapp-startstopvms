@@ -14,6 +14,7 @@ The following functionality is available:
 * Ability to Start and Stop Azure VM's for a given Subscription(required) based on a schedule
 * Ability to filter the VM's based on a Resource Group
 * Ability to filter the VM's based on a Tag 
+* Ability to configure an email sent whenever an action is taken with the number of VM's and the names of VM's affected.
 
 The implementation uses Azure VM async API's and Azure Functions Durable Functions. The number of VM's that are handled by a single Function can be controlled.
 
@@ -69,6 +70,9 @@ Next, update the Office 365 connection (If you dont have a Office 365 connection
 Once done, save the Logic Apps. Finally go ahead and Enable the Logic Apps.
 
 Once enabled, the Logic Apps will trigger on the schedule. You can test out the Logic Apps by clicking on Run Trigger to test out if the functionality works. 
+
+### Cost
+There is no additional cost of using this application other than the resources that are being used. Azure Functions and Azure Logic Apps have very generous free caps, so it should be free for most customers. Azure Functions also use Azure Storage. For normal use of this application - that cost should also be very minimal for managing thousands of machines.
 
 ### Output and Troubleshooting
 

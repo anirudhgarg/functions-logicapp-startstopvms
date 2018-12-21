@@ -465,7 +465,7 @@
                   {
                     "name": "resourceGroupName",
                     "type": "String",
-                    "value": "[resourceGroup().location]"
+                    "value": "[resourceGroup().name]"
                   }
                 ]
               },
